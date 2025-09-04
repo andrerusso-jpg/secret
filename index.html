@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nossa História de Amor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #FFD700; /* Gold */
+      --secondary-color: #FFC300; /* Bright Yellow */
+      --dark-color: #DAA520; /* GoldenRod */
+      --light-color: #ffffff; --background-light: #f7f8fc; --text-color: #555;
+      --success-color: #28a745; --font-family: 'Poppins', sans-serif; 
+      --shadow-sm: 0 4px 6px rgba(0,0,0,0.05); --shadow-md: 0 10px 15px rgba(0,0,0,0.1); 
+      --border-radius: 12px;
+    }
+    body { font-family: var(--font-family); margin: 0; padding-top: 80px; background-color: #000; color: var(--text-color); }
+    #backgroundCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+    #siteContent {
+      position: relative;
+      z-index: 1;
+    }
+    header { background-color: var(--light-color); padding: 1rem 2rem; box-shadow: var(--shadow-sm); position: fixed; width: 100%; top: 0; z-index: 1000; }
+    nav { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; }
+    .logo { font-size: 1.8rem; font-weight: 700; background: linear-gradient(to right, var(--primary-color), var(--secondary-color)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    nav ul { list-style: none; display: flex; gap: 2.5rem; margin: 0; }
+    nav a { text-decoration: none; color: var(--dark-color); font-weight: 600; }
+    section { padding: 5rem 2rem; text-align: center; }
+    h2 { font-size: 2.8rem; margin-bottom: 2.5rem;  color: #FFC300; font-weight: 700; }
+    .filter-container { max-width: 1200px; margin: 0 auto 2.5rem auto; display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; align-items: center; }
+    #search-bar { padding: 12px 20px; font-size: 1rem; border-radius: 50px; border: 1px solid #ddd; min-width: 250px; }
+    #category-filters { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+    .filter-btn { padding: 10px 20px; font-size: 0.9rem; font-weight: 600; border: 1px solid #ddd; background-color: var(--light-color); border-radius: 50px; cursor: pointer; transition: all 0.3s ease; }
+    .filter-btn.active { background: linear-gradient(to right, var(--primary-color), var(--secondary-color)); color: var(--light-color); border-color: var(--primary-color); }
+    .product-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2.5rem; max-width: 1200px; margin: 0 auto; }
+    .product-item { background-color: var(--light-color); border-radius: var(--border-radius); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .product-item:hover { transform: translateY(-10px); box-shadow: var(--shadow-md); }
+    .product-item img { width: 100%; height: 220px; object-fit: cover; }
+    .product-content { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; text-align: left; }
+    .product-content h3 { margin: 0 0 0.5rem 0; color: var(--dark-color); font-size: 1.25rem; }
+    .btn { padding: 12px 24px; border-radius: 50px; border: none; cursor: pointer; font-weight: 600; font-size: 1rem; transition: all 0.3s ease; }
+    .btn-primary { background: linear-gradient(to right, var(--primary-color), var(--secondary-color)); color: var(--light-color); }
+    .btn-secondary { background-color: #e9ecef; color: var(--dark-color); }
+    .btn-primary:hover { transform: translateY(-3px); }
+    .btn-secondary:hover { background-color: #d3d9df; }
+    .cart-container { max-width: 800px; margin: 0 auto; background: var(--light-color); padding: 2.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow-sm); }
+    .cart-item { display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; align-items: center; border-bottom: 1px solid #eee; padding: 1rem 0; }
+    .quantity-controls { display: flex; align-items: center; gap: .7rem; }
+    .quantity-controls button { background: #f1f1f1; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; }
+    .remove-btn { background: none; border: none; color: #ff6b6b; font-size: 1.2rem; cursor: pointer; }
+    .cart-actions { display: none; flex-direction: column; gap: 1rem; margin-top: 2rem; }
+    #orcamento-resumo { margin-top: 2rem; background: #f8f9fa; padding: 1.5rem; border-radius: var(--border-radius); text-align: left; display: none; }
+    footer { background: #e9ecef; padding: 2.5rem; margin-top: 2rem; text-align: center; }
+
+    #toast-notification {
+      visibility: hidden;
+      min-width: 250px;
+      background-color: var(--success-color);
+      color: #fff;
+      text-align: center;
+      border-radius: 50px;
+      padding: 16px;
+      position: fixed;
+      z-index: 2000;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 30px;
+      font-size: 1rem;
+      box-shadow: var(--shadow-md);
+      opacity: 0;
+      transition: visibility 0.5s, opacity 0.5s, bottom 0.5s ease-in-out;
+    }
+    #toast-notification.show {
+      visibility: visible;
+      opacity: 1;
+      bottom: 50px;
+    }
+    
+    .social-links { margin-bottom: 1rem; }
+    .social-links a { display: inline-block; transition: transform 0.2s ease-in-out; }
+    .social-links a:hover { transform: scale(1.1); }
+    .social-links svg { width: 32px; height: 32px; fill: var(--dark-color); }
+
+    /* Estilos específicos para a história de amor */
+    h2 { color: #FFC300; }
+    section { padding: 4rem 2rem; }
+    #momentos { background: #FFFDE7; padding: 3rem 2rem; border-radius: 16px; box-shadow: 0 4px 16px rgba(255, 195, 0, 0.15); }
+    #mensagem { background: #f8f9fa; padding: 3rem 2rem; border-radius: 16px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1); }
+  </style>
+</head>
+<body>
+  <canvas id="backgroundCanvas"></canvas>
+  <div id="siteContent">
+  <header>
+    <nav>
+      <div class="logo">Nossa História de Amor</div>
+      <ul>
+        <li><a href="#historia">História</a></li>
+        <li><a href="#momentos">Momentos</a></li>
+        <li><a href="#mensagem">Mensagem</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section id="historia">
+      <h2>Nosso dia</h2>
+      <p style="max-width:700px;margin:0 auto;font-size:1.3rem; color: #ddd;">Feliz aniversario de namoro meu amor, eu te amo!!.</p>
+    </section>
+    <section id="momentos">
+      <h2></h2>
+      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:4rem 5vw;max-width:1400px;margin:0 auto;">
+        <div style="background:#FFFACD;padding:2rem;border-radius:16px;box-shadow:0 4px 16px rgba(218, 165, 32, 0.15);max-width:340px;flex:1 1 340px;">
+          <h3>Nós dois juntos</h3>
+          <img src="Imagem do WhatsApp de 2025-09-03 à(s) 20.00.40_5f75d9f1.jpg" alt="Primeiro encontro" style="width:100%;border-radius:12px;margin-bottom:1rem;">
+          <p>Desde que nos conhecemos, ja sabiamos que acabariamos juntos, nós combinamos em todos os jeitos, na loucura, na felicidade, na preguiça, nas esquisitiçes, e até no estresse kkkkk</p>
+        </div>
+        <div style="background:#FFFACD;padding:2rem;border-radius:16px;box-shadow:0 4px 16px rgba(218, 165, 32, 0.15);max-width:340px;flex:1 1 340px;">
+          <h3>Voce é o meu maior presente</h3>
+          <img src="meio.jpg" alt="Viagem juntos" style="width:100%;border-radius:12px;margin-bottom:1rem;">
+          <p>Voce foi a melhor coisa que poderia ter acontecido na minha vida esse ano, a sua chegada mudou a minha vida, deixou tudo mais colorido e tudo mais gostoso de se viver.</p>
+        </div>
+        <div style="background:#FFFACD;padding:2rem;border-radius:16px;box-shadow:0 4px 16px rgba(218, 165, 32, 0.15);max-width:340px;flex:1 1 340px;">
+          <h3>Sou seu maior fã</h3>
+          <img src="ultimo.jpg" alt="Primeiro eu te amo" style="width:100%;border-radius:12px;margin-bottom:1rem;">
+          <p> Desde de quando eu soube que voce era a mulher da minha vida, eu não tirei os meus olhos de voce. eu passaria horas te admirando porque a minha paixão por voce não acaba.</p>
+        </div>
+      </div>
+    </section>
+    <section id="mensagem">
+      <h2>2 meses te amando</h2>
+      <p style="max-width:700px;margin:0 auto;font-size:1.3rem;">2 meses ao lado da mulher da minha vida, a cada dia que passamos longe um do outro, percebo a falta que voce faz na minha vida, voce deixa tudo mais feliz, tudo tem uma intensidade, que é o que voce tras pra minha vida, o seu amor é contagiante, e é por esse amor que eu me apaixonei e me apaixono todos os dias, apesar de estarmos nos entendendo ainda, e vou continuar te amando, e quero passar todos os dias da minha vida com voce!! Pra sempre juntos!! </p>. &hearts;</p>
+    </section>
+    <section id="declaracao">
+      
+      <div id="historicoNotas" style="max-width:600px;margin:2rem auto 0 auto;text-align:left;"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p style="font-size:1.2rem;color:#B8860B;">Feito com muito amor &hearts; para minha namorada. Todos os direitos reservados &copy; 2025</p>
+  </footer>
+
+  </div>
+  <div id="toast-notification"></div>
+
+  <script>
+    // --- NENHUMA ALTERAÇÃO NECESSÁRIA NA PARTE DOS CORAÇÕES ANIMADOS ---
+    function resizeCanvas() {
+      const canvas = document.getElementById('backgroundCanvas');
+      if (!canvas) return;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    function randomHeartColor() {
+      const colors = ['#FFD700', '#FFC300', '#FFFACD', '#FFA500', '#FFFDE7'];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+    function createHearts(n) {
+      const hearts = [];
+      for (let i = 0; i < n; i++) {
+        hearts.push({
+          x: Math.random() * window.innerWidth,
+          y: Math.random() * window.innerHeight,
+          r: 18 + Math.random() * 32,
+          color: randomHeartColor(),
+          dx: (Math.random() - 0.5) * 0.5,
+          dy: (Math.random() - 0.5) * 0.5,
+          angle: Math.random() * Math.PI * 2,
+          speed: 0.01 + Math.random() * 0.02
+        });
+      }
+      return hearts;
+    }
+    const hearts = createHearts(22);
+    function drawHeart(ctx, heart) {
+      ctx.save();
+      ctx.translate(heart.x, heart.y);
+      ctx.rotate(heart.angle);
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.bezierCurveTo(heart.r * 0.5, -heart.r * 0.7, heart.r, heart.r * 0.2, 0, heart.r);
+      ctx.bezierCurveTo(-heart.r, heart.r * 0.2, -heart.r * 0.5, -heart.r * 0.7, 0, 0);
+      ctx.closePath();
+      ctx.globalAlpha = 0.7;
+      ctx.fillStyle = heart.color;
+      ctx.shadowColor = heart.color;
+      ctx.shadowBlur = 18;
+      ctx.fill();
+      ctx.restore();
+    }
+    function animateHearts() {
+      const canvas = document.getElementById('backgroundCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const heart of hearts) {
+        drawHeart(ctx, heart);
+        heart.x += heart.dx;
+        heart.y += heart.dy;
+        heart.angle += heart.speed;
+        if (heart.x < 0 || heart.x > canvas.width) heart.dx *= -1;
+        if (heart.y < 0 || heart.y > canvas.height) heart.dy *= -1;
+      }
+      requestAnimationFrame(animateHearts);
+    }
+    animateHearts();
+
+    // --- A PARTIR DAQUI COMEÇAM AS ALTERAÇÕES PARA EXCLUIR NOTAS ---
+    
+    function getNotasLocal() {
+      try {
+        return JSON.parse(localStorage.getItem('notasAmor')) || [];
+      } catch(e) {
+        return [];
+      }
+    }
+    function setNotasLocal(notas) {
+      try {
+        localStorage.setItem('notasAmor', JSON.stringify(notas));
+      } catch(e) {}
+    }
+    
+    // MUDANÇA 1: Criada a função para excluir uma nota
+    function excluirNota(index) {
+      // Pede confirmação ao usuário antes de excluir
+      if (confirm('Tem certeza que deseja excluir esta nota?')) {
+        let notas = getNotasLocal();
+        // Remove a nota do array pelo índice
+        notas.splice(index, 1);
+        // Salva o novo array atualizado no localStorage
+        setNotasLocal(notas);
+        // Atualiza a exibição das notas na tela
+        renderHistorico();
+      }
+    }
+
+    document.getElementById('declaracaoForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var texto = document.getElementById('notaTexto').value;
+      var aviso = document.getElementById('declaracaoAviso');
+      if (texto.trim().length > 0) {
+        var data = new Date();
+        var nota = {
+          texto: texto,
+          data: data.toLocaleDateString() + ' ' + data.toLocaleTimeString()
+        };
+        var notasAtual = getNotasLocal();
+        notasAtual.unshift(nota);
+        setNotasLocal(notasAtual);
+        document.getElementById('notaTexto').value = '';
+        aviso.textContent = 'Nota salva com sucesso!';
+        renderHistorico();
+        setTimeout(function(){ aviso.textContent = ''; }, 2000);
+        document.getElementById('declaracaoForm').style.display = 'none';
+      } else {
+        aviso.textContent = 'Por favor, escreva algo para adicionar.';
+      }
+    });
+    
+    function renderHistorico() {
+      var notasRender = getNotasLocal();
+      var historico = document.getElementById('historicoNotas');
+      if (notasRender.length === 0) {
+        historico.innerHTML = '<span style="color:#DAA520;">Nenhuma nota adicionada ainda.</span>';
+      } else {
+        // MUDANÇA 2: Alterado o HTML de cada nota para incluir o botão de excluir
+        historico.innerHTML = notasRender.map(function(nota, i) {
+          return `<div style='background:#FFFDE7;border-radius:10px;padding:1rem;margin-bottom:1rem;box-shadow:0 2px 8px rgba(218, 165, 32, 0.15); position: relative;'>
+            <div style='font-size:0.95rem;color:#B8860B;font-weight:600;'>${nota.data}</div>
+            <div style='font-size:1.15rem;margin-top:0.5rem;'>${nota.texto}</div>
+            <button onclick="excluirNota(${i})" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #ff6b6b;">&times;</button>
+          </div>`;
+        }).join('');
+      }
+    }
+    renderHistorico();
+
+    document.getElementById('btnMostrarForm').addEventListener('click', function() {
+      var form = document.getElementById('declaracaoForm');
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+      if(form.style.display === 'block') {
+        document.getElementById('notaTexto').focus();
+      }
+    });
+  </script>
+</body>
+</html>
